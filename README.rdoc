@@ -1,0 +1,70 @@
+Bisques is a client library for Amazon SQS (Simple Queue Service). It is
+implemented using httpclient (https://github.com/nahi/httpclient).
+
+* http://github.com/jemmyw/bisques
+
+== USAGE
+
+To interact with SQS initialize a Bisques::Client object.
+
+The following scripts will result in the producer printing 10 numbers from the
+fibonacci sequence, with the consumer script doing the actual calculation.
+
+=== Producer
+
+  require 'bisques'
+
+  Bisques::AwsCredentials.default(aws_key, aws_secret)
+  client = Bisques::Client.new('us-east-1')
+  number_queue = client.get_or_create_queue('numbers')
+  result_queue = client.get_or_create_queue('results')
+
+  1.upto(10).each{|n| number_queue.post_message({"number" => n}) }
+
+  10.times do
+    puts result_queue.retrieve_one.inspect
+  end
+
+=== Consumer
+
+  require 'bisques'
+
+  Bisques::AwsCredentials.default(aws_key, aws_secret)
+  client = Bisques::Client.new('us-east-1')
+  number_queue = client.get_or_create_queue('numbers')
+  result_queue = client.get_or_create_queue('results')
+
+  listener = Bisques::QueueListener.new(number_queue)
+  listener.listen do |message|
+    result = fib(message["number"])
+    result_queue.post_message({"result" => result})
+    message.delete
+  end
+
+  while true; sleep 1; end
+
+== LICENSE
+
+Copyright (c) 2012 Jeremy Wells
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
