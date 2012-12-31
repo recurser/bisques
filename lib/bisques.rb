@@ -1,4 +1,4 @@
-# See README.rdoc
+# See {file:README README}
 module Bisques
   class Error < StandardError; end
   class MessageHasWrongMd5Error < Error

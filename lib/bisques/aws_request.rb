@@ -4,10 +4,10 @@ require 'bisques/aws_response'
 module Bisques
   # A request to an AWS API call. This class must be initiated with a client
   # instance of HTTPClient. A number of mandatory attributes must be set before
-  # calling make_request to return the response. #make_request returns an
-  # AwsResponse object.
+  # calling {#make_request} to return the response. {#make_request} returns an
+  # {AwsResponse} object.
   #
-  # === Example
+  # @example
   #
   #   request = AwsRequest.new(httpclient)
   #   request.method = "GET" or "POST"
@@ -18,47 +18,55 @@ module Bisques
   #   request.region = "AWS region (ex. us-east-1)"
   #   request.service = "AWS service (ex. sqs)"
   #   request.credentials = AwsCredentials.new("aws_key", "aws_secret")
-  #   response = request.make_request => Returns AwsResponse
+  #   response = request.make_request
   #
   class AwsRequest
-    # The HTTP method to use. Should be GET or POST.
+    # @return [String] The HTTP method to use. Should be GET or POST.
     attr_accessor :method
-    # A hash describing the query params to send.
+    # @return [Hash] A hash describing the query params to send.
     attr_accessor :query
-    # A hash or string describing the form params or HTTP body. Only used when
-    # the method is POST or PUT.
+    # @return [Hash,String] A hash or string describing the form params or HTTP body. Only used when
+    #   the method is POST or PUT.
     attr_accessor :body
-    # A hash of additional HTTP headers to send with the request.
+    # @return [Hash] A hash of additional HTTP headers to send with the request.
     attr_accessor :headers
-    # The path to the API call. This shouldn't be the full URL as the host part
-    # is built from the region and service.
+    # @return [String] The path to the API call. This shouldn't be the full URL as the host part
+    #   is built from the region and service.
     attr_accessor :path
-    # The AWS region. Ex: us-east-1
+    # @return [String] The AWS region. Ex: us-east-1
     attr_accessor :region
-    # The AWS service. Ex: sqs
+    # @return [String] The AWS service. Ex: sqs
     attr_accessor :service
-    # The AWS credentials. Should respond to aws_key and aws_secret. Use
-    # AwsCredentials.
+    # @return [AwsCredentials] The AWS credentials. Should respond to aws_key and aws_secret.
     attr_accessor :credentials
 
-    # An AwsResponse object describing the response. Returns nil until
-    # #make_request has been called.
+    # @return [AwsResponse] An AwsResponse object describing the response. Returns nil until
+    #   {#make_request} has been called.
     attr_reader :response
+    # @return [AwsRequestAuthorization]
+    # @!visibility private
     attr_reader :authorization # :nodoc:
 
     # AWS has some particular rules about how it likes it's form params encoded.
+    #
+    # @param [String] value
+    # @return [String] encoded value
     def self.aws_encode(value)
       value.to_s.gsub(/([^a-zA-Z0-9._~-]+)/n) do
         '%' + $1.unpack('H2' * $1.size).join('%').upcase
       end
     end
 
-    # Create a new AwsRequest using the given HTTPClient object.
+    # Create a new {AwsRequest} using the given HTTPClient object.
+    #
+    # @param [HTTPClient] httpclient
     def initialize(httpclient)
       @httpclient = httpclient
     end
 
     # The full URL to the API endpoint the request will call.
+    #
+    # @return [String]
     def url
       File.join("https://#{service}.#{region}.amazonaws.com", path)
     end

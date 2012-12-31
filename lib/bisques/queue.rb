@@ -11,9 +11,10 @@ module Bisques
     end
     class QueueNotFound < QueueError; end
 
-
+    # @!visibility private
     attr_reader :client # :nodoc:
 
+    # @!visibility private
     def self.sanitize_name(name)
       name = name.gsub(/[^_\w\d]/, "")
 
@@ -27,18 +28,21 @@ module Bisques
       name
     end
 
-    # Queues are created by the Client passing the client itself and the url
+    # Queues are created by the {Client} passing the client itself and the url
     # for the queue.
+    #
+    # @param [Client] client
+    # @param [String] url
     def initialize(client, url)
       @client, @url = client, url
     end
 
-    # The name of the queue derived from the URL.
+    # @return [String] The name of the queue derived from the URL.
     def name
       @url.split("/").last
     end
 
-    # The path part of the queue URL
+    # @return [String] The path part of the queue URL
     def path
       Addressable::URI.parse(@url).path
     end
@@ -50,7 +54,7 @@ module Bisques
     def ==(queue)
       hash == queue.hash
     end
-    def hash # :nodoc:
+    def hash
       @url.hash
     end
 
@@ -63,13 +67,16 @@ module Bisques
     # If more than one, or all, attributes are requested then a hash of
     # attribute names and values is returned.
     #
-    # ==== Example with one attribute:
+    # @param [String] attributes
+    # @return [Object,Hash]
     #
-    #   queue.attributes(:ApproximateNumberOfMessages) => 10
+    # @example with one attribute
     #
-    # ==== Example with multiple attributes:
+    #   queue.attributes(:ApproximateNumberOfMessages) == 10
     #
-    #   queue.attributes(:ApproximateNumberOfMessages, :ApproximateNumberOfMessagesDelayed) => {:ApproximateNumberOfMessages => 10, :ApproximateNumberOfMessagesDelayed => 5}
+    # @example with multiple attributes
+    #
+    #   queue.attributes(:ApproximateNumberOfMessages, :ApproximateNumberOfMessagesDelayed) == {:ApproximateNumberOfMessages => 10, :ApproximateNumberOfMessagesDelayed => 5}
     #
     def attributes(*attributes)
       return nil if attributes.blank?
@@ -92,18 +99,28 @@ module Bisques
     end
 
     # Delete the queue
+    # @return [AwsResponse]
+    # @raise [AwsActionError]
     def delete
       client.delete_queue(url)
     end
 
     # Post a message to the queue. The message must be serializable (i.e.
     # strings, numbers, arrays, hashes).
+    #
+    # @param [String,Fixnum,Array,Hash] object
+    # @raise [MessageHasWrongMd5Error]
+    # @raise [AwsActionError]
     def post_message(object)
       client.send_message(url, JSON.dump(object))
     end
 
     # Retrieve a message from the queue. Returns nil if no message is waiting
     # in the given poll time. Otherwise it returns a Message.
+    #
+    # @param [Fixnum] poll_time
+    # @return [Message,nil]
+    # @raise [AwsActionError]
     def retrieve(poll_time = 1)
       response = client.receive_message(url, {"WaitTimeSeconds" => poll_time, "MaxNumberOfMessages" => 1})
       raise QueueNotFound.new(self, "not found at #{url}") if response.http_response.status == 404
@@ -123,6 +140,10 @@ module Bisques
 
     # Retrieve a single message from the queue. This will block until a message
     # arrives. The message will be of the class Message.
+    #
+    # @param [Fixnum] poll_time
+    # @return [Message]
+    # @raise [AwsActionError]
     def retrieve_one(poll_time = 5)
       object = nil
       while object.nil?
@@ -134,6 +155,10 @@ module Bisques
     # Delete a message from the queue. This should be called to confirm that
     # the message has been processed. If it is not called then the message will
     # get put back on the queue after a timeout.
+    #
+    # @param [String] handle
+    # @return [Boolean] true if the message was deleted.
+    # @raise [AwsActionError]
     def delete_message(handle)
       response = client.delete_message(url, handle)
       response.success?
@@ -141,6 +166,10 @@ module Bisques
 
     # Return a message to the queue after receiving it. This would typically
     # happen if the receiver decided it couldn't process.
+    #
+    # @param [String] handle
+    # @return [AwsResponse]
+    # @raise [AwsActionError]
     def return_message(handle)
       client.change_message_visibility(url, handle, 0)
     end
