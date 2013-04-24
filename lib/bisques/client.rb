@@ -5,7 +5,7 @@ require 'bisques/queue_listener'
 require 'digest/md5'
 
 module Bisques
-  class QueueDeletedRecentlyError << Bisques::Error
+  class QueueDeletedRecentlyError < Bisques::Error
   end
 
   # Bisques is a client for Amazon SQS. All of the API calls made to SQS are
