@@ -5,6 +5,9 @@ require 'bisques/queue_listener'
 require 'digest/md5'
 
 module Bisques
+  class QueueDeletedRecentlyError << Bisques::Error
+  end
+
   # Bisques is a client for Amazon SQS. All of the API calls made to SQS are
   # called via methods on this class.
   #
@@ -53,6 +56,13 @@ module Bisques
         Queue.new(self, response.doc.xpath("//QueueUrl").text)
       else
         raise "Could not create queue #{name}"
+      end
+
+    rescue AwsActionError => error
+      if error.code == "AWS.SimpleQueueService.QueueDeletedRecently"
+        raise QueueDeletedRecentlyError, error.message
+      else
+        raise error
       end
     end
 
