@@ -1,14 +1,14 @@
 PATH
   remote: .
   specs:
-    bisques (1.0.0)
+    bisques (1.0.2)
       addressable
       httpclient
       json
       nokogiri
 
 GEM
-  remote: http://rubygems.org/
+  remote: https://rubygems.org/
   specs:
     addressable (2.3.2)
     columnize (0.3.6)
@@ -23,6 +23,7 @@ GEM
     httpclient (2.3.0.1)
     json (1.7.5)
     nokogiri (1.5.5)
+    rake (10.0.4)
     rspec (2.12.0)
       rspec-core (~> 2.12.0)
       rspec-expectations (~> 2.12.0)
@@ -38,4 +39,5 @@ PLATFORMS
 DEPENDENCIES
   bisques!
   debugger
+  rake
   rspec
