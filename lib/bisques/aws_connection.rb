@@ -115,6 +115,15 @@ module Bisques
       end
     end
 
+    # Ignore the http connection when marshalling
+    def marshal_dump
+      [@region, @service, @credentials]
+    end
+
+    def marshal_load array
+      @region, @service, @credentials = array
+    end
+
     private
     def aws_http_connection
       @aws_http_connection ||= HTTPClient.new.tap do |http|
