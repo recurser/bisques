@@ -165,6 +165,25 @@ module Bisques
       end
     end
 
+    def send_message_batch(queue_url, messages)
+      options = {}
+
+      messages.each_with_index do |message, index|
+        id = nil, body = nil
+
+        if message.is_a?(Array)
+          id, body, _ = message
+        else
+          body = message
+        end
+
+        options["SendMessageBatchRequestEntry.#{index+1}.Id"] = id if id.present?
+        options["SendMessageBatchRequestEntry.#{index+1}.MessageBody"] = body
+      end
+
+      action("SendMessageBatch", queue_url, options)
+    end
+
     # Delete a message from a queue. The message is deleted by the handle given
     # when the message is retrieved.
     #

@@ -115,7 +115,6 @@ module Bisques
       end
     end
 
-    # Ignore the http connection when marshalling
     def marshal_dump
       [@region, @service, @credentials]
     end

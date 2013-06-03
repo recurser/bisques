@@ -115,6 +115,24 @@ module Bisques
       client.send_message(url, JSON.dump(object))
     end
 
+    def post_messages(objects)
+      objects = objects.dup
+      group = []
+      while objects.any?
+        group.push objects.pop
+
+        if group.length == 10
+          client.send_message_batch(url, objects.map{|obj| JSON.dump(obj)})
+        end
+      end
+
+      if group.length > 0
+        client.send_message_batch(url, objects.map{|obj| JSON.dump(obj)})
+      end
+
+      nil
+    end
+
     # Retrieve a message from the queue. Returns nil if no message is waiting
     # in the given poll time. Otherwise it returns a Message.
     #
