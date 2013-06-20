@@ -1,3 +1,7 @@
+=== v1.0.5
+
+Reraise an error if object could not be parsed
+
 === v1.0.4
 
 Add bulk methods

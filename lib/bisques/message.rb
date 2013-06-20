@@ -14,6 +14,8 @@ module Bisques
     # @return [Hash] Hash of SQS attributes.
     attr_reader :attributes
 
+    InvalidObjectError = Class.new(StandardError)
+
     # @api
     # @param [Queue] queue
     # @param [String] id
@@ -34,6 +36,8 @@ module Bisques
     #
     def object
       @object ||= JSON.parse(body)
+    rescue => error
+      raise InvalidObjectError.new(error.to_s)
     end
 
     # @return (see Queue#delete_message)
