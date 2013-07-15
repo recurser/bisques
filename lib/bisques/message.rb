@@ -54,8 +54,8 @@ module Bisques
     # Return the message to the queue immediately. If a client has taken a
     # message and cannot process it for any reason it can put the message back
     # faster than the default timeout by calling this method.
-    def return
-      queue.return_message(handle)
+    def return(time=0)
+      queue.return_message(handle, time)
     end
   end
 end

@@ -188,8 +188,8 @@ module Bisques
     # @param [String] handle
     # @return [AwsResponse]
     # @raise [AwsActionError]
-    def return_message(handle)
-      client.change_message_visibility(url, handle, 0)
+    def return_message(handle, time = 0)
+      client.change_message_visibility(url, handle, time)
     end
   end
 end

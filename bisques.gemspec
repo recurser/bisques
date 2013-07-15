@@ -9,7 +9,7 @@ end.flatten
 
 spec = Gem::Specification.new do |s|
   s.name              = "bisques"
-  s.version           = "1.0.5"
+  s.version           = "1.0.6"
   s.author            = "Jeremy Wells"
   s.email             = "jemmyw@gmail.com"
   s.homepage          = "https://github.com/jemmyw/bisques"
