@@ -84,6 +84,12 @@ module Bisques
       options[:query] = query if query.any?
       options[:body] = form_body if body
 
+      Rails.logger.info "==========================================="
+      Rails.logger.info method
+      Rails.logger.info url
+      Rails.logger.info options
+      Rails.logger.info "==========================================="
+
       http_response = @httpclient.request(method, url, options)
       @response = AwsResponse.new(self, http_response)
 
